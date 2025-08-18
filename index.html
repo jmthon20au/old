@@ -11,6 +11,7 @@
     <style>
         body {
             font-family: 'Cairo', sans-serif;
+            scroll-behavior: smooth;
         }
         .result-card {
             background: linear-gradient(135deg, #ffffff, #f0f9ff);
@@ -23,6 +24,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0; /* Prevents icon from shrinking */
+        }
+        .suggestions-card {
+            background: linear-gradient(135deg, #f0fdf4, #e7f9f0);
+            border-right: 5px solid #22c55e;
         }
     </style>
 </head>
@@ -93,7 +99,7 @@
                     <!-- Gender Result -->
                     <div class="flex items-start">
                         <div class="icon-container">
-                            <svg class="w-6 h-6 text-sky-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+                            <svg class="w-6 h-6 text-sky-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" /></svg>
                         </div>
                         <div class="mr-4">
                             <p class="font-semibold text-slate-500">نوع الجنس:</p>
@@ -117,7 +123,8 @@
                         </div>
                         <div class="mr-4">
                             <p class="font-semibold text-slate-500">تاريخ بلوغكم:</p>
-                            <p id="result-date" class="text-lg font-bold text-slate-800"></p>
+                            <p id="result-date-long" class="text-lg font-bold text-slate-800"></p>
+                            <p id="result-date-short" class="text-md font-medium text-slate-600"></p>
                         </div>
                     </div>
                     <!-- Time Passed -->
@@ -142,15 +149,31 @@
             </div>
         </div>
 
+        <!-- Suggestions Section -->
+        <div id="suggestions-section" class="hidden mt-8 bg-white rounded-2xl shadow-xl p-6 md:p-8">
+            <div class="suggestions-card rounded-xl p-6">
+                <div class="flex items-center mb-4">
+                    <svg class="w-8 h-8 text-green-600 ml-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 5.25a1.5 1.5 0 0 1-1.5-1.5v-2.25a1.5 1.5 0 0 1 3 0v2.25a1.5 1.5 0 0 1-1.5 1.5M12 7.5h.008v.008H12V7.5Z" /></svg>
+                    <h2 class="text-2xl font-bold text-slate-800">اقتراحات ونصائح</h2>
+                </div>
+                <ul class="space-y-3 list-disc list-inside text-slate-700">
+                    <li>تذكر أن البلوغ هو بداية مرحلة **التكليف الشرعي**، فاحرص على أداء واجباتك الدينية بفهم ومحبة.</li>
+                    <li>هذه المرحلة هي نقطة انطلاق نحو **النضج والمسؤولية**. استثمر وقتك في تعلم ما ينفعك في دينك ودنياك.</li>
+                    <li>اجعل **والديك** مصدرك الأول للاستشارة، فهم الأكثر حرصاً على مصلحتك.</li>
+                    <li>اختر **الأصدقاء الصالحين** الذين يعينونك على الخير ويذكرونك بالله.</li>
+                </ul>
+            </div>
+        </div>
+
         <!-- Footer -->
-        <footer class="text-center mt-6">
+        <footer class="text-center mt-6 mb-4">
             <p id="copyright" class="text-sm text-slate-500">&copy; 2025 - جميع الحقوق محفوظة.</p>
         </footer>
 
     </div>
 
     <script>
-        // Function to handle the calculation
+        // Main function to handle the calculation
         function calculatePuberty() {
             // Get input values
             const day = parseInt(document.getElementById('day').value);
@@ -158,47 +181,24 @@
             const year = parseInt(document.getElementById('year').value);
             const gender = document.querySelector('input[name="gender"]:checked');
             const resultDiv = document.getElementById('result');
+            const suggestionsDiv = document.getElementById('suggestions-section');
 
             // --- Input Validation ---
-            if (!day || !month || !year) {
-                showError("الرجاء إدخال تاريخ ميلاد كامل.");
+            if (!validateInputs(day, month, year, gender)) {
+                suggestionsDiv.classList.add('hidden'); // Hide suggestions on error
                 return;
             }
-            if (!gender) {
-                showError("الرجاء اختيار الجنس.");
-                return;
-            }
-            
-            if (month < 1 || month > 12) {
-                showError("الشهر يجب أن يكون بين 1 و 12.");
-                return;
-            }
-            const daysInMonth = new Date(year, month, 0).getDate();
-            if (day < 1 || day > daysInMonth) {
-                showError(`اليوم يجب أن يكون بين 1 و ${daysInMonth} لهذا الشهر.`);
-                return;
-            }
-            if (year < 1900 || year > new Date().getFullYear()) {
-                showError("الرجاء إدخال سنة ميلاد صحيحة.");
-                return;
-            }
-
             hideError();
 
             // --- Calculation Logic ---
             let dob = new Date(year, month - 1, day);
-            let pubertyYears, pubertyMonths, pubertyDays;
-            let ageAtPubertyText;
+            let pubertyYears, pubertyMonths, pubertyDays, ageAtPubertyText;
 
             if (gender.value === 'male') {
-                pubertyYears = 14;
-                pubertyMonths = 6;
-                pubertyDays = 20;
+                [pubertyYears, pubertyMonths, pubertyDays] = [14, 6, 20];
                 ageAtPubertyText = "14 سنة و 6 أشهر و 20 يوماً";
             } else { // female
-                pubertyYears = 8;
-                pubertyMonths = 8;
-                pubertyDays = 23;
+                [pubertyYears, pubertyMonths, pubertyDays] = [8, 8, 23];
                 ageAtPubertyText = "8 سنوات و 8 أشهر و 23 يوماً";
             }
 
@@ -208,57 +208,95 @@
             pubertyDate.setDate(pubertyDate.getDate() + pubertyDays);
             
             // --- Time Passed Calculation ---
-            const today = new Date();
-            let passedText = '';
-            
-            today.setHours(0,0,0,0);
-            pubertyDate.setHours(0,0,0,0);
-
-            if (today < pubertyDate) {
-                 passedText = 'لم تصل إلى سن البلوغ بعد.';
-            } else {
-                let diffYears = today.getFullYear() - pubertyDate.getFullYear();
-                let diffMonths = today.getMonth() - pubertyDate.getMonth();
-                let diffDays = today.getDate() - pubertyDate.getDate();
-
-                if (diffDays < 0) {
-                    diffMonths--;
-                    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-                    diffDays += lastMonth.getDate();
-                }
-                if (diffMonths < 0) {
-                    diffYears--;
-                    diffMonths += 12;
-                }
-                
-                let parts = [];
-                if(diffYears > 0) parts.push(`${diffYears} سنة`);
-                if(diffMonths > 0) parts.push(`${diffMonths} أشهر`);
-                if(diffDays > 0) parts.push(`${diffDays} يوماً`);
-                if (parts.length === 0) {
-                    passedText = "لقد بلغت اليوم!";
-                } else {
-                    passedText = parts.join(' و ');
-                }
-            }
+            const passedText = calculateTimePassed(pubertyDate);
 
             // --- Display Results ---
-            document.getElementById('result-gender').textContent = gender.value === 'male' ? 'ذكر' : 'أنثى';
-            document.getElementById('result-age-at-puberty').textContent = ageAtPubertyText;
-            document.getElementById('result-date').textContent = pubertyDate.toLocaleDateString('ar-EG', {
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            displayResults({
+                gender: gender.value === 'male' ? 'ذكر' : 'أنثى',
+                ageAtPuberty: ageAtPubertyText,
+                pubertyDateLong: pubertyDate.toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+                pubertyDateShort: `${String(pubertyDate.getDate()).padStart(2, '0')} / ${String(pubertyDate.getMonth() + 1).padStart(2, '0')} / ${pubertyDate.getFullYear()}`,
+                passed: passedText
             });
-            document.getElementById('result-passed').textContent = passedText;
 
             resultDiv.classList.remove('hidden');
-            resultDiv.scrollIntoView({ behavior: 'smooth' });
+            suggestionsDiv.classList.remove('hidden');
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Function to validate all inputs
+        function validateInputs(day, month, year, gender) {
+            if (!day || !month || !year) {
+                showError("الرجاء إدخال تاريخ ميلاد كامل.");
+                return false;
+            }
+            if (!gender) {
+                showError("الرجاء اختيار الجنس.");
+                return false;
+            }
+            if (month < 1 || month > 12) {
+                showError("الشهر يجب أن يكون بين 1 و 12.");
+                return false;
+            }
+            const daysInMonth = new Date(year, month, 0).getDate();
+            if (day < 1 || day > daysInMonth) {
+                showError(`اليوم يجب أن يكون بين 1 و ${daysInMonth} لهذا الشهر.`);
+                return false;
+            }
+            if (year < 1900 || year > new Date().getFullYear()) {
+                showError("الرجاء إدخال سنة ميلاد صحيحة.");
+                return false;
+            }
+            return true;
+        }
+
+        // Function to calculate time passed since puberty
+        function calculateTimePassed(pubertyDate) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            pubertyDate.setHours(0, 0, 0, 0);
+
+            if (today < pubertyDate) {
+                return 'لم تصل إلى سن البلوغ بعد.';
+            }
+
+            let diffYears = today.getFullYear() - pubertyDate.getFullYear();
+            let diffMonths = today.getMonth() - pubertyDate.getMonth();
+            let diffDays = today.getDate() - pubertyDate.getDate();
+
+            if (diffDays < 0) {
+                diffMonths--;
+                const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                diffDays += lastMonth.getDate();
+            }
+            if (diffMonths < 0) {
+                diffYears--;
+                diffMonths += 12;
+            }
+            
+            let parts = [];
+            if (diffYears > 0) parts.push(`${diffYears} سنة`);
+            if (diffMonths > 0) parts.push(`${diffMonths} أشهر`);
+            if (diffDays > 0) parts.push(`${diffDays} يوماً`);
+            
+            return parts.length === 0 ? "لقد بلغت اليوم!" : parts.join(' و ');
+        }
+
+        // Function to update the DOM with results
+        function displayResults(data) {
+            document.getElementById('result-gender').textContent = data.gender;
+            document.getElementById('result-age-at-puberty').textContent = data.ageAtPuberty;
+            document.getElementById('result-date-long').textContent = data.pubertyDateLong;
+            document.getElementById('result-date-short').textContent = data.pubertyDateShort;
+            document.getElementById('result-passed').textContent = data.passed;
         }
 
         // --- Copy Results Function ---
         function copyResults() {
             const gender = document.getElementById('result-gender').textContent;
             const ageAtPuberty = document.getElementById('result-age-at-puberty').textContent;
-            const pubertyDate = document.getElementById('result-date').textContent;
+            const pubertyDateLong = document.getElementById('result-date-long').textContent;
+            const pubertyDateShort = document.getElementById('result-date-short').textContent;
             const timePassed = document.getElementById('result-passed').textContent;
             const copyright = document.getElementById('copyright').textContent;
             const copyButton = document.getElementById('copy-button');
@@ -268,27 +306,21 @@
 --- نتيجة حاسبة سن البلوغ ---
 نوع الجنس: ${gender}
 العمر عند البلوغ: ${ageAtPuberty}
-تاريخ بلوغكم: ${pubertyDate}
+تاريخ بلوغكم: ${pubertyDateLong} (${pubertyDateShort})
 مضى على بلوغكم: ${timePassed}
 -----------------------------
 نسأل الله تعالى أن يوفقكم في هذا البلوغ
 ${copyright}
             `.trim();
 
-            // Create a temporary textarea element to hold the text
             const textArea = document.createElement('textarea');
             textArea.value = textToCopy;
-            // Make it invisible
             textArea.style.position = 'fixed';
             textArea.style.left = '-9999px';
             document.body.appendChild(textArea);
-            
             textArea.select();
-            textArea.setSelectionRange(0, 99999); // For mobile devices
-
             try {
                 document.execCommand('copy');
-                // Visual feedback
                 const originalText = copyButton.querySelector('span').textContent;
                 copyButton.querySelector('span').textContent = 'تم النسخ!';
                 setTimeout(() => {
@@ -298,19 +330,15 @@ ${copyright}
                 console.error('Fallback: Oops, unable to copy', err);
                 alert('لم نتمكن من نسخ النص تلقائياً');
             }
-
             document.body.removeChild(textArea);
         }
         
         // Helper function to show errors
         function showError(message) {
             const errorDiv = document.getElementById('error-message');
-            const errorText = document.getElementById('error-text');
-            const resultDiv = document.getElementById('result');
-            
-            errorText.textContent = message;
+            errorDiv.querySelector('#error-text').textContent = message;
             errorDiv.classList.remove('hidden');
-            resultDiv.classList.add('hidden');
+            document.getElementById('result').classList.add('hidden');
         }
 
         // Helper function to hide errors
