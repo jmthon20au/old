@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة سن البلوغ الشرعي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+        .result-card {
+            background: linear-gradient(135deg, #ffffff, #f0f9ff);
+            border-right: 5px solid #0ea5e9;
+        }
+        .icon-container {
+            background-color: #e0f2fe;
+            border-radius: 50%;
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-2xl mx-auto">
+        
+        <!-- Main Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+            <div class="text-center mb-6">
+                <h1 class="text-3xl font-bold text-slate-800">حاسبة سن البلوغ الشرعي</h1>
+                <p class="text-slate-500 mt-2">أدخل تاريخ ميلادك لحساب تاريخ بلوغك بدقة</p>
+            </div>
+
+            <!-- Input Form -->
+            <div id="calculator-form">
+                <!-- Date of Birth Inputs -->
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div>
+                        <label for="day" class="block text-sm font-medium text-slate-600 mb-1">اليوم</label>
+                        <input type="number" id="day" placeholder="DD" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
+                    </div>
+                    <div>
+                        <label for="month" class="block text-sm font-medium text-slate-600 mb-1">الشهر</label>
+                        <input type="number" id="month" placeholder="MM" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
+                    </div>
+                    <div>
+                        <label for="year" class="block text-sm font-medium text-slate-600 mb-1">السنة</label>
+                        <input type="number" id="year" placeholder="YYYY" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
+                    </div>
+                </div>
+
+                <!-- Gender Selection -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-slate-600 mb-2">الجنس</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label for="male" class="flex items-center p-4 border border-slate-200 rounded-lg cursor-pointer has-[:checked]:bg-sky-50 has-[:checked]:border-sky-500 has-[:checked]:ring-2 has-[:checked]:ring-sky-500 transition">
+                            <input type="radio" id="male" name="gender" value="male" class="hidden">
+                            <svg class="w-6 h-6 text-sky-500 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+                            <span class="font-semibold text-slate-700">ذكر</span>
+                        </label>
+                        <label for="female" class="flex items-center p-4 border border-slate-200 rounded-lg cursor-pointer has-[:checked]:bg-pink-50 has-[:checked]:border-pink-500 has-[:checked]:ring-2 has-[:checked]:ring-pink-500 transition">
+                            <input type="radio" id="female" name="gender" value="female" class="hidden">
+                             <svg class="w-6 h-6 text-pink-500 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>
+                            <span class="font-semibold text-slate-700">أنثى</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Calculate Button -->
+                <button onclick="calculatePuberty()" class="w-full bg-sky-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-300 transition-all duration-300 transform hover:scale-105">
+                    احسب الآن
+                </button>
+            </div>
+            
+            <!-- Error Message -->
+            <div id="error-message" class="hidden mt-4 text-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert">
+                <strong class="font-bold">خطأ!</strong>
+                <span class="block sm:inline" id="error-text"></span>
+            </div>
+
+            <!-- Result Display -->
+            <div id="result" class="hidden mt-8">
+                 <div class="text-center mb-6">
+                    <p class="text-lg font-semibold text-slate-600">بسم الله الرحمن الرحيم</p>
+                </div>
+                <div class="result-card shadow-md rounded-xl p-6 space-y-5">
+                    <!-- Gender Result -->
+                    <div class="flex items-start">
+                        <div class="icon-container">
+                            <svg class="w-6 h-6 text-sky-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+                        </div>
+                        <div class="mr-4">
+                            <p class="font-semibold text-slate-500">نوع الجنس:</p>
+                            <p id="result-gender" class="text-lg font-bold text-slate-800"></p>
+                        </div>
+                    </div>
+                    <!-- Age at Puberty -->
+                     <div class="flex items-start">
+                        <div class="icon-container">
+                            <svg class="w-6 h-6 text-sky-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0h18" /></svg>
+                        </div>
+                        <div class="mr-4">
+                            <p class="font-semibold text-slate-500">العمر عند البلوغ:</p>
+                            <p id="result-age-at-puberty" class="text-lg font-bold text-slate-800"></p>
+                        </div>
+                    </div>
+                    <!-- Puberty Date -->
+                    <div class="flex items-start">
+                        <div class="icon-container">
+                           <svg class="w-6 h-6 text-sky-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0h18" /></svg>
+                        </div>
+                        <div class="mr-4">
+                            <p class="font-semibold text-slate-500">تاريخ بلوغكم:</p>
+                            <p id="result-date" class="text-lg font-bold text-slate-800"></p>
+                        </div>
+                    </div>
+                    <!-- Time Passed -->
+                    <div class="flex items-start">
+                        <div class="icon-container">
+                            <svg class="w-6 h-6 text-sky-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                        </div>
+                        <div class="mr-4">
+                            <p class="font-semibold text-slate-500">مضى على بلوغكم:</p>
+                            <p id="result-passed" class="text-lg font-bold text-slate-800"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-6">
+                    <p class="text-lg font-semibold text-slate-600">نسأل الله تعالى أن يوفقكم في هذا البلوغ</p>
+                </div>
+                <!-- Copy Button -->
+                <button id="copy-button" onclick="copyResults()" class="mt-4 w-full bg-slate-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-300 transition-all duration-300 flex items-center justify-center">
+                    <svg class="w-5 h-5 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.03 1.125 0 1.131.094 1.976 1.057 1.976 2.192V7.5m-9 3.75h9v8.25a2.25 2.25 0 0 1-2.25 2.25h-4.5a2.25 2.25 0 0 1-2.25-2.25V11.25Z" /></svg>
+                    <span>نسخ النتيجة</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center mt-6">
+            <p id="copyright" class="text-sm text-slate-500">&copy; 2025 - جميع الحقوق محفوظة.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // Function to handle the calculation
+        function calculatePuberty() {
+            // Get input values
+            const day = parseInt(document.getElementById('day').value);
+            const month = parseInt(document.getElementById('month').value);
+            const year = parseInt(document.getElementById('year').value);
+            const gender = document.querySelector('input[name="gender"]:checked');
+            const resultDiv = document.getElementById('result');
+
+            // --- Input Validation ---
+            if (!day || !month || !year) {
+                showError("الرجاء إدخال تاريخ ميلاد كامل.");
+                return;
+            }
+            if (!gender) {
+                showError("الرجاء اختيار الجنس.");
+                return;
+            }
+            
+            if (month < 1 || month > 12) {
+                showError("الشهر يجب أن يكون بين 1 و 12.");
+                return;
+            }
+            const daysInMonth = new Date(year, month, 0).getDate();
+            if (day < 1 || day > daysInMonth) {
+                showError(`اليوم يجب أن يكون بين 1 و ${daysInMonth} لهذا الشهر.`);
+                return;
+            }
+            if (year < 1900 || year > new Date().getFullYear()) {
+                showError("الرجاء إدخال سنة ميلاد صحيحة.");
+                return;
+            }
+
+            hideError();
+
+            // --- Calculation Logic ---
+            let dob = new Date(year, month - 1, day);
+            let pubertyYears, pubertyMonths, pubertyDays;
+            let ageAtPubertyText;
+
+            if (gender.value === 'male') {
+                pubertyYears = 14;
+                pubertyMonths = 6;
+                pubertyDays = 20;
+                ageAtPubertyText = "14 سنة و 6 أشهر و 20 يوماً";
+            } else { // female
+                pubertyYears = 8;
+                pubertyMonths = 8;
+                pubertyDays = 23;
+                ageAtPubertyText = "8 سنوات و 8 أشهر و 23 يوماً";
+            }
+
+            let pubertyDate = new Date(dob);
+            pubertyDate.setFullYear(pubertyDate.getFullYear() + pubertyYears);
+            pubertyDate.setMonth(pubertyDate.getMonth() + pubertyMonths);
+            pubertyDate.setDate(pubertyDate.getDate() + pubertyDays);
+            
+            // --- Time Passed Calculation ---
+            const today = new Date();
+            let passedText = '';
+            
+            today.setHours(0,0,0,0);
+            pubertyDate.setHours(0,0,0,0);
+
+            if (today < pubertyDate) {
+                 passedText = 'لم تصل إلى سن البلوغ بعد.';
+            } else {
+                let diffYears = today.getFullYear() - pubertyDate.getFullYear();
+                let diffMonths = today.getMonth() - pubertyDate.getMonth();
+                let diffDays = today.getDate() - pubertyDate.getDate();
+
+                if (diffDays < 0) {
+                    diffMonths--;
+                    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                    diffDays += lastMonth.getDate();
+                }
+                if (diffMonths < 0) {
+                    diffYears--;
+                    diffMonths += 12;
+                }
+                
+                let parts = [];
+                if(diffYears > 0) parts.push(`${diffYears} سنة`);
+                if(diffMonths > 0) parts.push(`${diffMonths} أشهر`);
+                if(diffDays > 0) parts.push(`${diffDays} يوماً`);
+                if (parts.length === 0) {
+                    passedText = "لقد بلغت اليوم!";
+                } else {
+                    passedText = parts.join(' و ');
+                }
+            }
+
+            // --- Display Results ---
+            document.getElementById('result-gender').textContent = gender.value === 'male' ? 'ذكر' : 'أنثى';
+            document.getElementById('result-age-at-puberty').textContent = ageAtPubertyText;
+            document.getElementById('result-date').textContent = pubertyDate.toLocaleDateString('ar-EG', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+            document.getElementById('result-passed').textContent = passedText;
+
+            resultDiv.classList.remove('hidden');
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- Copy Results Function ---
+        function copyResults() {
+            const gender = document.getElementById('result-gender').textContent;
+            const ageAtPuberty = document.getElementById('result-age-at-puberty').textContent;
+            const pubertyDate = document.getElementById('result-date').textContent;
+            const timePassed = document.getElementById('result-passed').textContent;
+            const copyright = document.getElementById('copyright').textContent;
+            const copyButton = document.getElementById('copy-button');
+
+            const textToCopy = `
+بسم الله الرحمن الرحيم
+--- نتيجة حاسبة سن البلوغ ---
+نوع الجنس: ${gender}
+العمر عند البلوغ: ${ageAtPuberty}
+تاريخ بلوغكم: ${pubertyDate}
+مضى على بلوغكم: ${timePassed}
+-----------------------------
+نسأل الله تعالى أن يوفقكم في هذا البلوغ
+${copyright}
+            `.trim();
+
+            // Create a temporary textarea element to hold the text
+            const textArea = document.createElement('textarea');
+            textArea.value = textToCopy;
+            // Make it invisible
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            
+            textArea.select();
+            textArea.setSelectionRange(0, 99999); // For mobile devices
+
+            try {
+                document.execCommand('copy');
+                // Visual feedback
+                const originalText = copyButton.querySelector('span').textContent;
+                copyButton.querySelector('span').textContent = 'تم النسخ!';
+                setTimeout(() => {
+                    copyButton.querySelector('span').textContent = originalText;
+                }, 2000);
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+                alert('لم نتمكن من نسخ النص تلقائياً');
+            }
+
+            document.body.removeChild(textArea);
+        }
+        
+        // Helper function to show errors
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            const resultDiv = document.getElementById('result');
+            
+            errorText.textContent = message;
+            errorDiv.classList.remove('hidden');
+            resultDiv.classList.add('hidden');
+        }
+
+        // Helper function to hide errors
+        function hideError() {
+            document.getElementById('error-message').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
